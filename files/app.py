@@ -235,6 +235,13 @@ def inject_theme():
             border-bottom-color: var(--gold) !important;
         }
 
+        /* Streamlit captions use the default theme's muted ink, which is too
+           dark against this page's deep-green background. */
+        [data-testid="stCaptionContainer"],
+        [data-testid="stCaptionContainer"] *{
+            color: #CFE3DE !important;
+        }
+
         [data-testid="stDataFrame"]{
             border-radius: 12px; overflow:hidden;
             border: 1px solid rgba(231,181,75,0.25);
