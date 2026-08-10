@@ -1,3 +1,4 @@
 streamlit
 pandas
-pythainlp[ner]
+pythainlp
+python-crfsuite
