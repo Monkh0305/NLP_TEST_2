@@ -12,6 +12,17 @@ import streamlit as st
 from pythainlp.tokenize import word_tokenize
 from pythainlp.tag import pos_tag, NER
 
+
+def render_html(html: str):
+    """แสดง HTML/CSS ผ่าน st.markdown อย่างปลอดภัย
+    Markdown จะตีความบรรทัดที่มีการเยื้อง (indent) แม้เพียงบรรทัดเดียวว่าเป็น 'โค้ดบล็อก'
+    แล้วแสดงเป็นข้อความดิบแทนที่จะ render เป็น HTML จริง โดยเฉพาะ CSS ที่ซ้อนหลายชั้น
+    มักมีระดับการเยื้องไม่เท่ากัน ฟังก์ชันนี้จึงตัดช่องว่างหน้า-หลังทุกบรรทัดออกทั้งหมด
+    (ไม่ใช่แค่ dedent ร่วมกัน) และตัดบรรทัดว่างออก ก่อนส่งเข้า st.markdown
+    """
+    lines = [ln.strip() for ln in html.splitlines() if ln.strip() != ""]
+    st.markdown("\n".join(lines), unsafe_allow_html=True)
+
 # ------------------------------------------------------------------
 # ตั้งค่าหน้าเว็บ
 # ------------------------------------------------------------------
@@ -45,7 +56,7 @@ POS_COLOR_MAP = {
 # ธีม / CSS — คอนเซ็ปต์ "ตั๋วเดินทาง (Boarding Pass)"
 # ------------------------------------------------------------------
 def inject_theme():
-    st.markdown(
+    render_html(
         """
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Chonburi&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -242,8 +253,7 @@ def inject_theme():
             * { transition:none !important; animation:none !important; }
         }
         </style>
-        """,
-        unsafe_allow_html=True,
+        """
     )
 
 
@@ -371,7 +381,7 @@ def style_by_keyword(df: pd.DataFrame, column: str, color_map: dict):
 # ------------------------------------------------------------------
 inject_theme()
 
-st.markdown(
+render_html(
     """
     <div class="ticket-eyebrow"><span class="dot"></span>TRIP · TEXT · ANALYSIS · NLP-TH01</div>
     <div class="hero-title">🧳 ระบบวิเคราะห์ข้อความจองทริปท่องเที่ยว</div>
@@ -380,8 +390,7 @@ st.markdown(
         ด้วยเทคนิค Regex, Tokenization, POS Tagging และ Named Entity Recognition (PyThaiNLP)
     </div>
     <hr class="perforation" />
-    """,
-    unsafe_allow_html=True,
+    """
 )
 
 EXAMPLES = [
@@ -428,46 +437,40 @@ if analyze:
             budgets = list(dict.fromkeys(e["text"] for e in entities if e["type"] == "MONEY"))
             days = extract_days_nights(cleaned)
 
-        st.markdown(
-            '<div style="color:#B7F2C2; font-weight:600; margin-bottom:.5rem;">✅ วิเคราะห์เสร็จแล้ว</div>',
-            unsafe_allow_html=True,
-        )
+        render_html('<div style="color:#B7F2C2; font-weight:600; margin-bottom:.5rem;">✅ วิเคราะห์เสร็จแล้ว</div>')
 
         # ---------------- สรุปผลลัพธ์หลัก (ตั๋วฉีก 4 ใบ) ----------------
-        st.markdown(
+        render_html(
             '<div class="stub-row">'
             + stat_stub("📍", "สถานที่เที่ยว", len(places))
             + stat_stub("🏨", "โรงแรม/ที่พัก", len(hotels))
             + stat_stub("💰", "งบประมาณที่พบ", len(budgets))
             + stat_stub("📅", "จำนวนวัน/คืน", len(days))
-            + "</div>",
-            unsafe_allow_html=True,
+            + "</div>"
         )
 
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(
+            render_html(
                 '<div class="board-panel">'
                 '<h4>📍 สถานที่เที่ยว &amp; 🏨 โรงแรม/ที่พัก</h4>'
                 + chip_list_html(places)
                 + '<div style="height:.6rem;"></div>'
                 + chip_list_html(hotels, gold=True)
-                + "</div>",
-                unsafe_allow_html=True,
+                + "</div>"
             )
         with col2:
             days_display = [f"{num} {unit}" for num, unit in days]
-            st.markdown(
+            render_html(
                 '<div class="board-panel">'
                 '<h4>💰 งบประมาณ &amp; 📅 จำนวนวัน/คืน</h4>'
                 + chip_list_html(budgets, gold=True)
                 + '<div style="height:.6rem;"></div>'
                 + chip_list_html(days_display)
-                + "</div>",
-                unsafe_allow_html=True,
+                + "</div>"
             )
 
-        st.markdown('<hr class="perforation" />', unsafe_allow_html=True)
+        render_html('<hr class="perforation" />')
 
         tab1, tab2 = st.tabs(["🔎 POS TAGGING", "🏷️ NER (BIO TAG)"])
         with tab1:
@@ -487,7 +490,7 @@ if analyze:
                 height=350,
             )
 else:
-    st.markdown(
+    render_html(
         """
         <div class="empty-ticket">
             <div class="big">🎫</div>
@@ -495,6 +498,5 @@ else:
             พิมพ์หรือวางข้อความด้านบน แล้วกด "วิเคราะห์ข้อความ"<br/>
             หรือลองกดตัวอย่างในแถบด้านซ้ายดูก่อนก็ได้
         </div>
-        """,
-        unsafe_allow_html=True,
+        """
     )
