@@ -64,5 +64,4 @@ streamlit run app.py
 
 ## URL
 
-- Streamlit App: `<ใส่ลิงก์หลัง deploy>`
-- GitHub Repository: `<ใส่ลิงก์ repo>`
+- Streamlit App: https://nlptest2-qcjrzgtjcutke6ttaa6tv9.streamlit.app/
